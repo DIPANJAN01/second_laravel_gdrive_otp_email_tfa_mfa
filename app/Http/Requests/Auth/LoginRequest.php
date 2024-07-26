@@ -31,6 +31,7 @@ class LoginRequest extends FormRequest
      */
     public function rules(): array
     {
+        //these rules automatically apply immediately (before anything else) to any request instantiated as LoginRequest, because rules() run immediately (before all other methods) against a request that's being instantiated to LoginRequest. This is why, in other methods of this class, you don't need to validate the fields of the request mentioned here again because they have already been validated, and had they found to be invalid, an error would've been thrown long before you get the chance to invoke the other methods
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
@@ -73,7 +74,7 @@ class LoginRequest extends FormRequest
         $this->validate([
             'otp' => ['required', 'string', 'size:8'] //email and password are already covered by rules()
         ]);
-        Log::info("After validate");
+        // Log::info("After validate");
         $user = User::where('email', $this->email)->first();
 
 
@@ -83,11 +84,13 @@ class LoginRequest extends FormRequest
 
         if (
             !$user ||
-            $user->loginOtp === null ||
+            !$user->loginOtp ||
             $user->loginOtp->expires_at <= Carbon::now() ||
             !Hash::check($this->otp, $user->loginOtp->otp)
         ) {
+
             // Log::info("Inside triple if");
+
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'otp' => __('auth.failed'),
