@@ -66,49 +66,49 @@ class LoginRequest extends FormRequest
 
         RateLimiter::clear($this->throttleKey());
     }
-    public function authenticateWithOtp(): void
-    {
-        $this->ensureIsNotRateLimited();
+    // public function authenticateWithOtp(): void
+    // {
+    //     $this->ensureIsNotRateLimited();
 
 
-        $this->validate([
-            'otp' => ['required', 'string', 'size:8'] //email and password are already covered by rules()
-        ]);
-        // Log::info("After validate");
-        $user = User::where('email', $this->email)->first();
+    //     $this->validate([
+    //         'otp' => ['required', 'string', 'size:8'] //email and password are already covered by rules()
+    //     ]);
+    //     // Log::info("After validate");
+    //     $user = User::where('email', $this->email)->first();
 
 
-        // Log::info("Client given Password: " . $this->otp);
-        // Log::info("Hashed Password: " . $user->loginOtp->otp);
+    //     // Log::info("Client given Password: " . $this->otp);
+    //     // Log::info("Hashed Password: " . $user->loginOtp->otp);
 
 
-        if (
-            !$user ||
-            !$user->loginOtp ||
-            $user->loginOtp->expires_at <= Carbon::now() ||
-            !Hash::check($this->otp, $user->loginOtp->otp)
-        ) {
+    //     if (
+    //         !$user ||
+    //         !$user->loginOtp ||
+    //         $user->loginOtp->expires_at <= Carbon::now() ||
+    //         !Hash::check($this->otp, $user->loginOtp->otp)
+    //     ) {
 
-            // Log::info("Inside triple if");
+    //         // Log::info("Inside triple if");
 
-            RateLimiter::hit($this->throttleKey());
-            throw ValidationException::withMessages([
-                'otp' => __('auth.failed'),
-            ]);
-        }
+    //         RateLimiter::hit($this->throttleKey());
+    //         throw ValidationException::withMessages([
+    //             'otp' => __('auth.failed'),
+    //         ]);
+    //     }
 
 
-        if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+    //     if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+    //         RateLimiter::hit($this->throttleKey());
 
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
-        }
+    //         throw ValidationException::withMessages([
+    //             'email' => __('auth.failed'),
+    //         ]);
+    //     }
 
-        LoginOtp::where('user_id', $user->id)->delete();
-        RateLimiter::clear($this->throttleKey());
-    }
+    //     LoginOtp::where('user_id', $user->id)->delete();
+    //     RateLimiter::clear($this->throttleKey());
+    // }
 
     /**
      * Ensure the login request is not rate limited.

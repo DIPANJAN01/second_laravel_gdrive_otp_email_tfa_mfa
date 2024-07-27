@@ -26,13 +26,14 @@ class AuthenticatedSessionController extends Controller
 
         $request->authenticate();
 
-        $otp = $this->generateAndSaveOtp($request);
+        $data = $this->generateAndSaveOtp($request);
 
-        $this->sendOtpEmail($otp, $request->email);
+        $this->sendOtpEmail($data['otp'], $request->email);
 
         return response()->json([
             "message" => "Otp sent to email. Please verify.",
-            "email" => $request->email
+            "email" => $request->email,
+            "key" => $data['key'],
         ]);
 
         // $request->session()->regenerate();
@@ -83,15 +84,18 @@ class AuthenticatedSessionController extends Controller
         $otp = $this->getRandomAlphabet() . rand(config("custom.otp_values.start"), config("custom.otp_values.end")) . $this->getRandomAlphabet();
 
         // Store OTP and expiration time in the login_otps table
-        LoginOtp::create([
+        $loginOtp = LoginOtp::create([
             'user_id' => $user->id,
             'otp' => Hash::make($otp),  //encrypt the otp while saving in database
-            // 'expires_at' => Carbon::now()->addMinute(),
+            //the otp gets hashed while the key doesn't is because the key is just a temporary identifier to identify which user it was that gave correct credentials and now is submitting the otp. The otp gets hashed because that is the critical value, but this key field doesn't get hashed, its just an identifier (hashing it would just needlessly make searching for it in db more difficult and its entire point was to be searched effectively in the first place), arguably more secure than email, which could also have been used to identify the user at /verify-otp, but that could've lead to spams from an attacker if the attacker somehow got to know the user's email, which is pretty easy to do. With randomly generated, short-lived, temporary uuids, even if the attacker knows it, he can't do much damage
             'expires_at' => Carbon::now()->addSeconds(30),
-            // 'expires_at' => Carbon::now()->addMinutes(60),
+
         ]); //if ::create() fails, an exception is thrown which prompts Laravel to automatically handle it and send a response
 
-        return $otp;
+        return [
+            "otp" => $otp,
+            "key" => $loginOtp->key,
+        ];
     }
     private function sendOtpEmail(String $otp, String $email)
     {

@@ -5,7 +5,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | This file is for mapping custom environment variables that don't belong to any third party services (otherwise we'd have just put those variables (even if they were custom env variables) in config > services.php file)
+    | This file is for mapping custom environment variables that don't belong to any third party services (otherwise we'd have just put those variables (even if they were custom env variables) in config > services.php file, etc.)
     |--------------------------------------------------------------------------
 
     */
