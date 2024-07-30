@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\Tutor\GenerateTutorLoginOtpController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\Tutor\VerifyTutorLoginOtpController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\VerifyLoginOtpController;
 use Illuminate\Support\Facades\Route;
@@ -40,3 +42,17 @@ Route::post('/verify-login-otp', [VerifyLoginOtpController::class, 'verify'])
 Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
+
+Route::prefix('tutor')->group(function () {
+    Route::post('/get-authenticated', [GenerateTutorLoginOtpController::class, 'store']) //the route was originally: /login
+        ->middleware('guest:tutor')
+        ->name('tutor.login');
+
+    Route::post('/verify-otp', [VerifyTutorLoginOtpController::class, 'verify'])
+        ->middleware('guest:tutor')
+        ->name('tutor.verify');
+
+    Route::post('/logout', [VerifyTutorLoginOtpController::class, 'destroy'])
+        ->middleware('auth:tutor')
+        ->name('tutor.logout');
+});

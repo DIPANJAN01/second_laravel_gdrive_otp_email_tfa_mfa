@@ -11,16 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('login_otps', function (Blueprint $table) {
+        Schema::create('tutor_login_otps', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete(); //you should also make this unique(we've done it at the very last statement here)
+            $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
             $table->string('otp');
-            $table->uuid('key')->unique();
             $table->timestamp('expires_at');
 
             // Add unique constraint to user_id
-            $table->unique('user_id');
+            $table->unique('tutor_id');
         });
     }
 
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('login_otps');
+        Schema::dropIfExists('tutor_login_otps');
     }
 };

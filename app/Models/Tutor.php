@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Tutor extends Model
 {
     use HasFactory;
+    protected $fillable = [
+        'name',
+        'email',
+        'age',
+        'number',
+    ];
+
+    public function loginOtp()
+    {
+        return $this->hasOne(TutorLoginOtp::class);
+    }
 }
