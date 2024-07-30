@@ -28,17 +28,23 @@ class DatabaseSeeder extends Seeder
         //     'password' => bcrypt('Password123$$$'),
         // ]);
 
+        // Tutor::factory()->create([
+        //     'name' => 'Sam',
+        //     'age' => 21,
+        //     'email' => 'sam@gmail.com',
+        //     'number' => '11111'
+        // ]);
+        // Tutor::factory()->create([
+        //     'name' => 'Jack',
+        //     'age' => 21,
+        //     'email' => 'jack@gmail.com',
+        //     'number' => '22222'
+        // ]);
         Tutor::factory()->create([
-            'name' => 'Sam',
-            'age' => 21,
-            'email' => 'sam@gmail.com',
-            'number' => '11111'
-        ]);
-        Tutor::factory()->create([
-            'name' => 'Jack',
-            'age' => 21,
-            'email' => 'jack@gmail.com',
-            'number' => '22222'
+            'name' => 'Dip',
+            'age' => 24,
+            'email' => 'dipanjanghosal01@gmail.com',
+            'number' => '33333'
         ]);
     }
 }

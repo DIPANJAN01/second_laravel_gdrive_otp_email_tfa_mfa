@@ -27,11 +27,21 @@ class GenerateTutorLoginOtpController extends Controller
      */
     public function store(GenerateTutorLoginOtpRequest $request): JsonResponse //this return type must be made JsonResponse, not Response! Otherwise this will fail!
     {
-        $request->validateEmail(); //if email is invalid, a response will be sent otherwise will proceed to below
+        $isValid = $request->validateEmail(); //if email is invalid in format or missing, a laravel will immediately send a response from there by throwing a validation error, and if email is valid in format but doesn't exist in db, will return false (simply returning a response from there doesn't stop the execution flow, it just returns the response to its caller (which would be here), stopping the control flow and returning response immediately from any point can only be done by throwing exceptions without handling them)
 
+        if (!$isValid) { //email format was valid but wasn't found in db
+            Log::info($request->input('email') . " doesn't exist in tutors table");
+
+            return response()->json([
+                "message" => "Otp sent to email. Please verify.",
+                "email" => $request->input('email'),
+            ], 200); //this is bad practice, I know. But I'm desperate to stop the brute-forcers
+        }
         // $request->authenticate();
 
         $otp = $this->generateAndSaveOtp($request);
+
+        Log::info("Reaching sendOtpEmail, Otp: $otp");
 
         $this->sendOtpEmail($otp, $request->email);
 
@@ -49,7 +59,10 @@ class GenerateTutorLoginOtpController extends Controller
     private function generateAndSaveOtp(GenerateTutorLoginOtpRequest $request)
     {
         // Fetch the tutor
-        $tutor = Tutor::where('email', $request->email)->first();
+        $tutor = Tutor::where('email', $request->input('email'))->first();
+        // if (!$tutor) {
+        //     abort(404); //coming inside generateOtp means the tutor should already be in the db, but if the user is still not found for some reason (maybe it got deleted by the time this function executes), we'll abort this request from here, although an error would be thrown and err response would've been given anyways in the next line where you'd be trying to access member of null
+        // }
 
         // Retrieve the latest OTP record for the tutor
         $loginOtp = TutorLoginOtp::where('tutor_id', $tutor->id)->first();
@@ -68,7 +81,7 @@ class GenerateTutorLoginOtpController extends Controller
         }
 
         // Generate OTP
-        $otp = Str::password(12);
+        $otp = Str::password(16);
         Log::info("$tutor->email = $otp");
 
         // Store OTP and expiration time in the login_otps table

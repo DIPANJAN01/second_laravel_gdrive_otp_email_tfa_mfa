@@ -9,7 +9,7 @@ class TutorLoginOtp extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'otp', 'expires_at'];
+    protected $fillable = ['tutor_id', 'otp', 'expires_at'];
 
     public function tutor()
     {

@@ -1,5 +1,7 @@
 <?php
 
+// Strangely enough, I'm able to access even guest routes after logging in as tutor, which is abnormal and shouldn't be. Like if I log in as user, I can't access the guest route, which is exactly what is expected. But not when logging in as tutor
+
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\Tutor\GenerateTutorLoginOtpController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -48,8 +50,8 @@ Route::prefix('tutor')->group(function () {
         ->middleware('guest:tutor')
         ->name('tutor.login');
 
-    Route::post('/verify-otp', [VerifyTutorLoginOtpController::class, 'verify'])
-        ->middleware('guest:tutor')
+    Route::post('/verify-login-otp', [VerifyTutorLoginOtpController::class, 'verify'])
+        ->middleware('guest')
         ->name('tutor.verify');
 
     Route::post('/logout', [VerifyTutorLoginOtpController::class, 'destroy'])

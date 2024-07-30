@@ -69,8 +69,11 @@ class VerifyOtpRequest extends FormRequest
             // Log::info("Inside triple if");
 
             RateLimiter::hit($this->throttleKey());
+            // throw ValidationException::withMessages([
+            //     'otp' => __('auth.failed'),
+            // ]);
             throw ValidationException::withMessages([
-                'otp' => __('auth.failed'),
+                'credentials' => __('auth.failed'), //the key can be any string but best is to not give anything specific like email or otp (especially when it comes to auth), just give a vague 'credentials' as key string for the client on which field was wrong, and in the _(), you give a code, such as auth.failed is a built-in code in laravel that has a nice associated string to it (which is "These credentials do not match our records").
             ]);
         }
 

@@ -7,6 +7,7 @@ use App\Models\Tutor;
 use App\Models\TutorLoginOtp;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -36,7 +37,7 @@ class VerifyTutorLoginOtpRequest extends FormRequest
         //these rules automatically apply immediately (before anything else) to any request instantiated as VerifyTutorLoginOtpRequest, because rules() run immediately (before all other methods) against a request that's being instantiated to LoginRequest. This is why, in other methods of this class, you don't need to validate the fields of the request mentioned here again because they have already been validated, and had they found to be invalid, an error would've been thrown long before you get the chance to invoke the other methods
         return [
             'email' => ['required', 'string', 'email'],
-            'otp' => ['required', 'string', 'size:12'],
+            'otp' => ['required', 'string', 'size:16'],
         ];
     }
 
@@ -63,9 +64,12 @@ class VerifyTutorLoginOtpRequest extends FormRequest
         $tutor = Tutor::where('email', $this->input('email'))->first();
         if (!$tutor) {
             RateLimiter::hit($this->throttleKey());
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401); // 401 Unauthorized
+            // return response()->json([
+            //     'message' => 'Invalid credentials'
+            // ], 401); // 401 Unauthorized
+            throw ValidationException::withMessages([
+                'credentials' => __('auth.failed'),
+            ]);
         }
 
         $loginOtp = TutorLoginOtp::where('tutor_id', $tutor->id)->first();
@@ -83,13 +87,18 @@ class VerifyTutorLoginOtpRequest extends FormRequest
             // throw ValidationException::withMessages([
             //     'otp' => __('auth.failed'),
             // ]);
-            return response()->json([
-                'message' => 'Invalid credentials'
-            ], 401); // 401 Unauthorized
+            throw ValidationException::withMessages([
+                'credentials' => __('auth.failed'), //the key can be any string but best is to not give anything specific like email or otp (especially when it comes to auth), just give a vague 'credentials' as key string for the client on which field was wrong, and in the _(), you give a code, such as auth.failed is a built-in code in laravel that has a nice associated string to it (which is "These credentials do not match our records").
+            ]);
+            // return response()->json([
+            //     'message' => 'Invalid credentials'
+            // ], 401); // 401 Unauthorized
         }
 
-        $user = $loginOtp->user;
-        Auth::login($user, $this->boolean('remember')); //the second argument of login() enables long lived sessions if given true (for the feature 'Remember me' checkbox in the client). We're checking if the client sent a key named 'remember' in the request and whether its true or false (by if doesn't exist, it'll be null and the default argument of login() will kick in, which is false for $remember)
+
+        // Log in the tutor with the 'tutor' guard (very important! If you don't specify the guard during login, the default guard will be used, which has been configured to be 'web' guard, then you'll be able to access web guarded routes but not tutor guarded routes! Setting appropriate guards during login is very important! Do the same when logging in using Auth::attempt() too like this: Auth::guard('tutor')->attempt($credentials)):
+        Auth::guard('tutor')->login($tutor, $this->boolean('remember')); //the second argument of login() enables long lived sessions if given true (for the feature 'Remember me' checkbox in the client). We're checking if the client sent a key named 'remember' in the request and whether its true or false (by if doesn't exist, it'll be null and the default argument of login() will kick in, which is false for $remember)
+
 
 
         $loginOtp->delete();

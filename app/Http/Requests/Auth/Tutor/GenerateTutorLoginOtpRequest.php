@@ -46,48 +46,17 @@ class GenerateTutorLoginOtpRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
-    {
-        $this->ensureIsNotRateLimited();
-
-        // if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
-        //     RateLimiter::hit($this->throttleKey());
-
-        //     throw ValidationException::withMessages([
-        //         'email' => __('auth.failed'),
-        //     ]);
-        // }
-
-        if (!Auth::validate($this->only('email', 'password'))) {
-            // Log::info('In authenticate, inside  !Auth::validate()');
-            RateLimiter::hit($this->throttleKey());
-
-            throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
-            ]);
-        }
-
-        RateLimiter::clear($this->throttleKey());
-    }
-    /**
-     * Attempt to authenticate the request's credentials.
-     *
-     * @throws \Illuminate\Validation\ValidationException
-     */
     public function validateEmail()
     {
         $this->ensureIsNotRateLimited();
-        $emailExists = Tutor::where('email', $this->email)->exists();
+        $emailExists = Tutor::where('email', $this->input('email'))->exists();
         if (!$emailExists) {
             RateLimiter::hit($this->throttleKey());
-
-            return response()->json([
-                "message" => "Otp sent to email. Please verify.",
-                "email" => $this->email,
-            ], 200);
+            return false;
         }
 
         RateLimiter::clear($this->throttleKey());
+        return true;
     }
 
 

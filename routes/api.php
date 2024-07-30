@@ -6,13 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+// Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
+Route::middleware(['auth:web'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware(['auth:sanctum'])->get('/secret', function (Request $request) {
+// Route::middleware(['auth:sanctum'])->get('/secret', function (Request $request) {
+Route::middleware(['auth:web'])->get('/secret', function (Request $request) {
     return response()->json([
         'secret' => 'This is a secret!'
+    ]);
+});
+
+Route::middleware(['auth:tutor'])->get('/tutor/secret', function (Request $request) {
+    return response()->json([
+        'secret' => 'This is a Tutor secret!'
     ]);
 });
 
