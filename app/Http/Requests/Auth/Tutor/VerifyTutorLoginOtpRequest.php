@@ -47,7 +47,7 @@ class VerifyTutorLoginOtpRequest extends FormRequest
      * @throws \Illuminate\Validation\ValidationException
      */
 
-    public function authenticateWithOtp(): void
+    public function authenticateWithOtp()
     {
         $this->ensureIsNotRateLimited();
 
@@ -103,6 +103,7 @@ class VerifyTutorLoginOtpRequest extends FormRequest
 
         $loginOtp->delete();
         RateLimiter::clear($this->throttleKey());
+        return $tutor->id;
     }
 
     /**

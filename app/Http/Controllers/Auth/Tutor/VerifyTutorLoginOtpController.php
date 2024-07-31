@@ -22,14 +22,15 @@ class VerifyTutorLoginOtpController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function verify(VerifyTutorLoginOtpRequest $request): Response //this return type must be made JsonResponse, not Response! Otherwise this will fail!
+    public function verify(VerifyTutorLoginOtpRequest $request): JsonResponse //this return type must be made JsonResponse, not Response! Otherwise this will fail!
     {
         // Log::info("Before authenticate with otp");
-        $request->authenticateWithOtp();
+        $tutor_id = $request->authenticateWithOtp();
         // Log::info("After authenticate with otp");
         $request->session()->regenerate();
 
-        return response()->noContent();
+        // return response()->noContent();
+        return response()->json(['success' => true, 'tutorId' => $tutor_id]); //tutor id doesn't need to be sent but eh
     }
 
     /**

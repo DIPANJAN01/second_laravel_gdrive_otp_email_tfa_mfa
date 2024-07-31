@@ -45,7 +45,7 @@ Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
 
-Route::prefix('tutor')->group(function () {
+Route::prefix('tutors')->group(function () {
     Route::post('/get-authenticated', [GenerateTutorLoginOtpController::class, 'store']) //the route was originally: /login
         ->middleware('guest:tutor')
         ->name('tutor.login');
