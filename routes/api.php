@@ -51,7 +51,7 @@ Route::get('/bcrypt', function (Request $request) {
 // Route::apiResource("tutors", TutorController::class)->except(["index", "store"]);//equivalent to:
 // Route::apiResource("tutors", TutorController::class)->only(["show", "update", "destroy"])->middleware("auth:tutor");
 
-Route::middleware('auth:tutor')->group(function () {
+Route::middleware(['auth:tutor'])->group(function () {
     Route::apiResource('tutors', TutorController::class)->only([
         'update', 'destroy'
     ]);

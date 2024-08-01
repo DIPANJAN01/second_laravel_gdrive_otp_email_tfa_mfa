@@ -40,11 +40,17 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'jack@gmail.com',
         //     'number' => '22222'
         // ]);
-        Tutor::factory()->create([
-            'name' => 'Dip',
-            'age' => 24,
-            'email' => 'dipanjanghosal01@gmail.com',
-            'number' => '33333'
-        ]);
+        // Tutor::factory()->create([
+        //     'name' => 'Dip',
+        //     'age' => 24,
+        //     'email' => 'dipanjanghosal01@gmail.com',
+        //     'number' => '33333'
+        // ]);
+        // Tutor::factory()->create([
+        //     'name' => 'DipYT',
+        //     'age' => 24,
+        //     'email' => 'dipanjan01yt@gmail.com',
+        //     'number' => '44444'
+        // ]);
     }
 }

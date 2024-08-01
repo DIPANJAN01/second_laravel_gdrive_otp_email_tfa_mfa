@@ -51,7 +51,7 @@ Route::prefix('tutors')->group(function () {
         ->name('tutor.login');
 
     Route::post('/verify-login-otp', [VerifyTutorLoginOtpController::class, 'verify'])
-        ->middleware('guest')
+        ->middleware('guest:tutor')
         ->name('tutor.verify');
 
     Route::post('/logout', [VerifyTutorLoginOtpController::class, 'destroy'])

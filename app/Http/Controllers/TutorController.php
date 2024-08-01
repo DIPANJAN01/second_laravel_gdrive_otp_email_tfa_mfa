@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class TutorController extends Controller
@@ -34,7 +35,9 @@ class TutorController extends Controller
         // Get the currently authenticated tutor
         $tutor = Auth::guard('tutor')->user();
 
+
         if ($tutor) {
+            Gate::authorize('view', $tutor);
             return response()->json(['tutor' => $tutor], 200);
         } else {
             return response()->json(['message' => 'Tutor not found.'], 404);
@@ -46,6 +49,8 @@ class TutorController extends Controller
      */
     public function update(Request $request, Tutor $tutor)
     {
+        Gate::authorize('update', $tutor);
+
         $validatedData = $request->validate([
             'name' => ['required', 'string'],
             'age' => ['required', 'integer', 'min:18'],
@@ -74,6 +79,8 @@ class TutorController extends Controller
      */
     public function destroy(Tutor $tutor)
     {
+        Gate::authorize('delete', $tutor);
+
         $wasDeleted = $tutor->delete();
         if ($wasDeleted) {
             return response()->json(['success' => true], 200);
