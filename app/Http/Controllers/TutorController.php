@@ -6,6 +6,7 @@ use App\Models\Tutor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class TutorController extends Controller
@@ -34,14 +35,31 @@ class TutorController extends Controller
         // return response()->json(['tutor' => $tutor], 200);
         // Get the currently authenticated tutor
         $tutor = Auth::guard('tutor')->user();
+        // Log::info("In show()");
+        // Log::info("Tutor: $tutor");
+        // Log::info("Tutor is an instance of Tutor? ");
+        // Log::info($tutor instanceof Tutor ? "true" : "false");
 
 
         if ($tutor) {
+            // Log::info('Inside if($tutor)');
+
             Gate::authorize('view', $tutor);
+            // Log::info('After authorize()');
             return response()->json(['tutor' => $tutor], 200);
         } else {
             return response()->json(['message' => 'Tutor not found.'], 404);
         }
+    }
+    public function showById(Tutor $tutor)
+    {
+        // return response()->json(['tutor' => $tutor], 200);
+        // Get the currently authenticated tutor
+
+        // Log::info("In showById");
+        Gate::authorize('view', $tutor);
+        // Log::info("Tutor: $tutor");
+        return response()->json(['tutor' => $tutor], 200);
     }
 
     /**
@@ -49,6 +67,11 @@ class TutorController extends Controller
      */
     public function update(Request $request, Tutor $tutor)
     {
+        $currentTutor = Auth::guard('tutor')->user();
+        // Log::info("In update()");
+        // Log::info("Current Tutor: $tutor");
+        // Log::info("Target Tutor: $tutor");
+
         Gate::authorize('update', $tutor);
 
         $validatedData = $request->validate([
