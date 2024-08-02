@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+// use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,10 +23,18 @@ class MultiAuthMiddleware
         //     return $next($request);
         // }
         if (Auth::guard('tutor')->check()) {
-            Auth::setUser(Auth::guard('tutor')->user()); //this is super important!!! Otherwise authorization policies won't work!!(Gate::authorize() calls will fail instantly without even executing ANY of its inner methods like before(), etc. then)
+            Log::info('In tutor guard');
+
+
+            $guard = Auth::setUser(Auth::guard('tutor')->user()); //this is super important!!! Otherwise authorization policies won't work!!(Gate::authorize() calls will fail instantly without even executing ANY of its inner methods like before(), etc. then)
+            // Log::info('In tutor guard, guard:' . $guard);
+
+
             return $next($request);
         } elseif (Auth::guard('web')->check()) {
-            Auth::setUser(Auth::guard('web')->user()); //this is super important!!! Otherwise authorization policies won't work!!(Gate::authorize() calls will fail instantly without even executing ANY of its inner methods like before(), etc. then)
+            Log::info('In web guard');
+
+            $guard = Auth::setUser(Auth::guard('web')->user()); //this is super important!!! Otherwise authorization policies won't work!!(Gate::authorize() calls will fail instantly without even executing ANY of its inner methods like before(), etc. then)
             return $next($request);
         }
         // else {//don't need else here, because above, you're not just calling next(), you're RETURNING the result of next(), so anything below won't even follow

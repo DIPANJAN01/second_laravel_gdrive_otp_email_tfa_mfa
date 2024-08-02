@@ -14,7 +14,8 @@ class TutorPolicy
      */
     public function before($user, string $ability): bool|null //the first argument in all these methods always implicitly gives the currently authenticated user/tutor, etc. (you don't have to pass the first argument during function call, it's given implicitly, so you'll pass the second argument using function in the first position and so on... during the function call)
     {
-        Log::info("In before():     Current tutor id: $user->id");
+        Log::info("Inside before()");
+
         if ($user instanceof User) { //that means its an admin (we're using the 'users' table for admin)
             return true;
         }
@@ -34,8 +35,6 @@ class TutorPolicy
      */
     public function view(Tutor $currentTutor, Tutor $tutor): bool
     {
-        Log::info("Current tutor id: $currentTutor->id");
-        Log::info("Target tutor id: $tutor->id");
 
         return $currentTutor->id === $tutor->id;
     }

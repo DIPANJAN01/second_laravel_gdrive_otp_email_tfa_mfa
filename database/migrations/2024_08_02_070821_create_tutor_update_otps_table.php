@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tutors', function (Blueprint $table) {
+        Schema::create('tutor_update_otps', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('name');
-            $table->integer('age');
-            $table->string('email')->unique();
-            $table->string('number')->unique();
+            $table->foreignId('tutor_id')->constrained('tutors')->cascadeOnDelete();
+            $table->string('otp');
+            $table->string('type');
+            $table->timestamp('expires_at');
 
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('password')->default('');
-            $table->rememberToken();
+            // Add unique constraint to user_id
+            $table->unique('tutor_id');
         });
     }
 
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tutors');
+        Schema::dropIfExists('tutor_update_otps');
     }
 };
