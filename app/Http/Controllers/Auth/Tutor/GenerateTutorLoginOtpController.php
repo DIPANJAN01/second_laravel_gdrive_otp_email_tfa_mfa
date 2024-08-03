@@ -48,6 +48,7 @@ class GenerateTutorLoginOtpController extends Controller
         return response()->json([
             "message" => "Otp sent to email. Please verify.",
             "email" => $request->email,
+            "otp_duration" => 60,
         ]);
 
         // $request->session()->regenerate();
@@ -81,7 +82,13 @@ class GenerateTutorLoginOtpController extends Controller
         }
 
         // Generate OTP
-        $otp = Str::password(16);
+        // $otp = Str::password(16);
+        $specialCharacters = ['$', '*', '#', '%'];
+        $randomKey = array_rand($specialCharacters);
+
+        $otp = Str::password(1, true, false, false) .  Str::password(6, false, true, false) . Str::password(1, true, false, false); //A123456c
+        //  . $specialCharacters[$randomKey]; //A123456$ //characters doesn't get easily selected against letters or numbers, we should have easily copyable OTPs
+
         Log::info("$tutor->email = $otp");
 
         // Store OTP and expiration time in the login_otps table
@@ -91,7 +98,8 @@ class GenerateTutorLoginOtpController extends Controller
             'expires_at' => Carbon::now()->addMinute(),
 
         ]); //if ::create() fails, an exception is thrown which prompts Laravel to automatically handle it and send a response
-
+        // Log::info("Otp: $otp");
+        // abort(500);
         return $otp;
     }
     private function sendOtpEmail(String $otp, String $email)

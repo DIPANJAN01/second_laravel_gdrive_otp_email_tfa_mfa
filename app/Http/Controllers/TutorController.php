@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
@@ -23,13 +24,13 @@ class TutorController extends Controller
         $newOtpValue = Str::password(6, false, true, false);
         $newOtpRow = TutorUpdateOtp::create([
             'tutor_id' => $tutor->id,
-            'otp' => $newOtpValue,
+            'otp' => Hash::make($newOtpValue),
             'type' => 'email',
             'expires_at' => Carbon::now()->addMinute(),
         ]);
         if ($newOtpRow !== null && $newOtpRow !== null) {
 
-            Mail::to($newEmail)->send(new OtpEmail($newOtpRow->otp));
+            Mail::to($newEmail)->send(new OtpEmail($newOtpValue));
         }
 
         return $newOtpRow;
@@ -135,7 +136,8 @@ class TutorController extends Controller
 
                 return response()->json([
                     'status' => 'otp',
-                    'message' => "Otp sent successfully to " . $validatedData['email']
+                    'message' => "Otp sent successfully to " . $validatedData['email'],
+                    'otp_duration' => 60,
                 ]);
             }
 
@@ -151,12 +153,13 @@ class TutorController extends Controller
 
                 return response()->json([
                     'status' => 'otp',
-                    'message' => "Previous otp expired. New Otp generated and sent successfully to " . $validatedData['email']
+                    'message' => "Previous otp expired. New Otp generated and sent successfully to " . $validatedData['email'],
+                    'otp_duration' => 60,
                 ]);
             }
 
             $validatedReqMailOtp = $request->validate(['email_otp' => ['required', 'string', 'size:6']]);
-            if ($tutorUpdateOtp->otp !== $validatedReqMailOtp['email_otp']) {
+            if (!Hash::check($validatedReqMailOtp['email_otp'], $tutorUpdateOtp->otp)) {
                 return response()->json([
                     'status' => 'failure',
                     'message' => "Invalid Otp!"

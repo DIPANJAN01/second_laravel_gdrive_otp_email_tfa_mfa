@@ -37,7 +37,7 @@ class VerifyTutorLoginOtpRequest extends FormRequest
         //these rules automatically apply immediately (before anything else) to any request instantiated as VerifyTutorLoginOtpRequest, because rules() run immediately (before all other methods) against a request that's being instantiated to LoginRequest. This is why, in other methods of this class, you don't need to validate the fields of the request mentioned here again because they have already been validated, and had they found to be invalid, an error would've been thrown long before you get the chance to invoke the other methods
         return [
             'email' => ['required', 'string', 'email'],
-            'otp' => ['required', 'string', 'size:16'],
+            'otp' => ['required', 'string', 'size:8'],
         ];
     }
 
