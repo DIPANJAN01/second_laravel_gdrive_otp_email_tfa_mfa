@@ -17,16 +17,16 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         //comment this out because otherwise running seed will apply this again, and since these emails already exist in the users table (because we seeded them once before) and have the unique constraints. it'll give errors because laravel will try to push/seed these rows with the same emails again 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => bcrypt('password'),
-        ]);
-        User::factory()->create([
-            'name' => 'Dipanjan',
-            'email' => 'dipanjanghosal01@gmail.com',
-            'password' => bcrypt('Password123$$$'),
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Test User',
+        //     'email' => 'test@example.com',
+        //     'password' => bcrypt('password'),
+        // ]);
+        // User::factory()->create([
+        //     'name' => 'Dipanjan',
+        //     'email' => 'dipanjanghosal01@gmail.com',
+        //     'password' => bcrypt('Password123$$$'),
+        // ]);
 
         // Tutor::factory()->create([
         //     'name' => 'Sam',
@@ -46,11 +46,11 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'dipanjanghosal01@gmail.com',
         //     'number' => '33333'
         // ]);
-        // Tutor::factory()->create([
-        //     'name' => 'DipYT',
-        //     'age' => 24,
-        //     'email' => 'dipanjan01yt@gmail.com',
-        //     'number' => '44444'
-        // ]);
+        Tutor::factory()->create([
+            'name' => 'DipYT',
+            'age' => 24,
+            'email' => 'dipanjan01yt@gmail.com',
+            'number' => '44444'
+        ]);
     }
 }

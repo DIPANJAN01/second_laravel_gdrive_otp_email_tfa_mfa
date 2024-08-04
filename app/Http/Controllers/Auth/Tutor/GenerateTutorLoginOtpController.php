@@ -83,8 +83,8 @@ class GenerateTutorLoginOtpController extends Controller
 
         // Generate OTP
         // $otp = Str::password(16);
-        $specialCharacters = ['$', '*', '#', '%'];
-        $randomKey = array_rand($specialCharacters);
+        // $specialCharacters = ['$', '*', '#', '%'];
+        // $randomKey = array_rand($specialCharacters);
 
         $otp = Str::password(1, true, false, false) .  Str::password(6, false, true, false) . Str::password(1, true, false, false); //A123456c
         //  . $specialCharacters[$randomKey]; //A123456$ //characters doesn't get easily selected against letters or numbers, we should have easily copyable OTPs

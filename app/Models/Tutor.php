@@ -55,4 +55,8 @@ class Tutor extends Authenticatable
     {
         return $this->hasOne(TutorUpdateOtp::class);
     }
+    public function updateHistories()
+    {
+        return $this->hasMany(TutorHistory::class);
+    }
 }

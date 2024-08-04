@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\OtpEmail;
 use App\Models\Tutor;
+use App\Models\TutorHistory;
 use App\Models\TutorUpdateOtp;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -167,9 +168,30 @@ class TutorController extends Controller
             }
         }
 
+        $originalAttributes = $tutor->getOriginal();
 
         $wasUpdated = $tutor->update($validatedData); //returns true or false
+
+
+
         if ($wasUpdated) {
+            $updatedAttributes = Tutor::find($tutor->id)->getOriginal();
+
+            $updatedFields = array_diff_assoc($updatedAttributes, $originalAttributes);
+            // $updatedFields['id'] = $tutor->id;
+            unset($updatedFields['updated_at']);
+            $updateHistory = [
+                'original' => $originalAttributes,
+                'updated' => $updatedFields,
+            ];
+            // Log::info("Original fields: " . json_encode($originalAttributes));
+            // Log::info("Updated fields: " . json_encode($updatedFields));
+            // Log::info("Update History: " . json_encode($updateHistory));
+            TutorHistory::create([
+                'history' => json_encode($updateHistory),
+                'type' => 'update', //also make sure to add to tutor_histories when making a new tutor in authentication, and set 'type' to 'insert'
+                'tutor_id' => $tutor->id,
+            ]);
             return response()->json(['success' => true], 200);
         } else {
             return response()->json(['success' => false], 400);
@@ -182,12 +204,25 @@ class TutorController extends Controller
     public function destroy(Tutor $tutor)
     {
         Gate::authorize('delete', $tutor);
-
+        $tutorId = $tutor->id;
         $wasDeleted = $tutor->delete();
         if ($wasDeleted) {
+            $updateHistory = [
+                'original' => $tutor->getOriginal(),
+                'updated' => [],
+            ];
+            TutorHistory::create([
+                'history' => json_encode($updateHistory),
+                'type' => 'delete',
+                // 'tutor_id' => $tutorId,
+            ]);
             return response()->json(['success' => true], 200);
         } else {
             return response()->json(['success' => false], 400);
         }
     }
+
+    // public function updateHistory($tutor, $type){
+
+    // }
 }
