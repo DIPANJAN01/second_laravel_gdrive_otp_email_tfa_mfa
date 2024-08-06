@@ -16,6 +16,8 @@ return [
     'google' => [
         // 'credentials_json' => base64_decode(env('GDRIVE_CREDENTIALS')),
         'credentials_json' => json_decode(base64_decode(env('GDRIVE_CREDENTIALS')), true),
+        'web_api_test' => env('GOOGLE_APP_SCRIPT_TEST_API'),
+        'web_api_test_secret' => env('GOOGLE_APP_SCRIPT_TEST_API_SECRET'),
     ],
 
     'postmark' => [

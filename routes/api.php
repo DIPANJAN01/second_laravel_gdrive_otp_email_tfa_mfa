@@ -5,6 +5,8 @@ use App\Mail\OtpEmail;
 use App\Mail\WelcomeEmail;
 use App\Models\Tutor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +48,47 @@ Route::get('/bcrypt', function (Request $request) {
         "bcrypted" => bcrypt("1234"),
     ];
 });
+
+Route::get(
+    '/reject',
+    function (Request $request) {
+        Log::info('env value: ' . config('services.google.web_api_test'));
+
+        try {
+            $response = Http::withHeaders([
+                // 'secret' => 'YOUR_SECRET',//GAS doesn't give us any way to access request headers in its doPost(e) function, so we need to pass the auth keys via body itself, not headers
+            ])->post(
+                config('services.google.web_api_test'),
+                // "asxc.conaaea",
+                [
+                    'secret' => config('services.google.web_api_test_secret'), //the secret key
+                    'person' => [
+                        'name' => 'John Doe',
+                        'email' => 'john.doe@example.com'
+                    ],
+                    'rejected' => ['dipanjanghosal01@gmail.com',] //will contain all the rejected person's emails
+                ]
+            );
+            Log::info("No Error Response " . $response->body());
+            return response()->json(['status' => 'success', 'gas_response' => $response->body()]);
+
+            // Print the response body
+        } catch (\Exception $e) {
+
+            Log::info("Error Response: " . $e->getMessage());
+            return 'Request failed: ' . $e->getMessage();
+
+            // $response->onError(function ($response) {
+
+            //     Log::info("Error Response: " . $response->body());
+            //     return 'Request failed: ' . $response->body();
+            // });
+
+            // Log::info("No error Response: " . $response->body());
+            // return $response->body();
+        }
+    }
+);
 
 
 // Route::apiResource("tutors", TutorController::class)->except(["index", "store"]);//equivalent to:
